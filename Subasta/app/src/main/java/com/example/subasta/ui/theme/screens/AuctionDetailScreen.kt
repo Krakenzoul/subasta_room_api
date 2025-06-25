@@ -17,37 +17,43 @@ import com.example.subasta.data.repository.AuctionRepository
 import com.example.subasta.viewModel.AuctionViewModelFactory
 
 
+// Archivo: com/example.subasta.ui.theme.screens/AuctionDetailScreen.kt
 @Composable
 fun AuctionDetailScreen(
     auctionId: String,
     navController: NavHostController,
     repository: AuctionRepository
 ) {
-    // ViewModel con Factory (inyección manual del repositorio)
     val viewModel: AuctionViewModel = viewModel(
         factory = AuctionViewModelFactory(repository)
     )
 
-    // Estado de la subasta observando el Flow
-    val auction by viewModel.selectedAuction.collectAsState()
+    val auction by viewModel.selectedAuction.collectAsState() // Esto es AuctionEntity?
 
-    // Efecto para cargar los datos al entrar
     LaunchedEffect(auctionId) {
         viewModel.loadAuctionDetail(auctionId)
     }
 
-    // UI
     if (auction != null) {
+        // Usa 'auction!!' para asegurar que el compilador sepa que no es nulo aquí,
+        // ya que está dentro del bloque 'if (auction != null)'.
+        // Opcional: puedes usar 'auction?.let { currentAuction -> ... }'
+        val currentAuction = auction!! // <--- ¡Añade esta línea!
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            Text("Título: ${auction!!.title}", style = MaterialTheme.typography.headlineSmall)
+            Text("Título: ${currentAuction.title}", style = MaterialTheme.typography.headlineSmall)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Descripción: ${auction!!.description}", style = MaterialTheme.typography.bodyLarge)
+            Text("Descripción: ${currentAuction.description}", style = MaterialTheme.typography.bodyLarge)
             Spacer(modifier = Modifier.height(8.dp))
-            Text("Puja actual: $${auction!!.currentBid}", style = MaterialTheme.typography.bodyMedium)
+            Text("Puja actual: $${currentAuction.currentBid}", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("URL Imagen: ${currentAuction.imageUrl}", style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Finalizada: ${if (currentAuction.isFinished) "Sí" else "No"}", style = MaterialTheme.typography.bodySmall)
 
             Spacer(modifier = Modifier.height(24.dp))
             Button(onClick = { navController.popBackStack() }) {
@@ -55,7 +61,6 @@ fun AuctionDetailScreen(
             }
         }
     } else {
-        // Estado de carga o error
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
         }

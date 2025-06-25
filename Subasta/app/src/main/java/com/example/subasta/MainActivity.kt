@@ -1,4 +1,4 @@
-package com.example.subastas
+package com.example.subasta
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,16 +17,18 @@ import com.example.subasta.data.localbd.AuctionDao
 import com.example.subasta.ui.theme.SubastaTheme
 import com.example.subasta.ui.theme.screens.AuctionListScreen
 import androidx.navigation.compose.rememberNavController
-import com.example.subasta.data.localbd.AuctionDatabase
+import com.example.subasta.data.localbd.AppDatabase
 import com.example.subasta.data.repository.AuctionRepository
 import com.example.subasta.navigation.AppNavigation
 
+// Archivo: com/example/subastas/MainActivity.kt
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         // Inicializar Room
-        val db = AuctionDatabase.getDatabase(applicationContext)
+        // ASEGÚRATE DE USAR AppDatabase.getDatabase AQUÍ
+        val db = AppDatabase.getDatabase(applicationContext) // <--- ¡CAMBIAR AQUÍ!
         val dao = db.auctionDao()
 
         // Crear el repositorio

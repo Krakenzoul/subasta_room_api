@@ -1,4 +1,3 @@
-package org.example
 
 import com.example.module
 import io.ktor.server.application.*

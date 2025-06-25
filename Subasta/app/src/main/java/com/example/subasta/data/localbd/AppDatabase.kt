@@ -1,29 +1,29 @@
 package com.example.subasta.data.localbd
 
-
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.subasta.data.model.AuctionEntity
-import com.example.subasta.data.localbd.AuctionDao
 
-@Database(entities = [AuctionEntity::class], version = 1, exportSchema = false)
-abstract class AuctionDatabase : RoomDatabase() {
+@Database(entities = [AuctionEntity::class], version = 2, exportSchema = false)
+abstract class AppDatabase : RoomDatabase() {
 
     abstract fun auctionDao(): AuctionDao
 
     companion object {
         @Volatile
-        private var INSTANCE: AuctionDatabase? = null
+        private var INSTANCE: AppDatabase? = null
 
-        fun getDatabase(context: Context): AuctionDatabase {
+        fun getDatabase(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    AuctionDatabase::class.java,
+                    AppDatabase::class.java,
                     "auction_database"
-                ).build()
+                )
+                    .fallbackToDestructiveMigration() // ¡Esta es la línea clave!
+                    .build()
                 INSTANCE = instance
                 instance
             }
