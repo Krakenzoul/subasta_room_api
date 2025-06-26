@@ -12,11 +12,13 @@ import com.example.subasta.data.repository.AuctionRepository
 import com.example.subasta.viewModel.AuctionViewModel
 import com.example.subasta.viewModel.AuctionViewModelFactory
 import java.util.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.ui.text.font.FontWeight
 
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
-import androidx.compose.ui.unit.dp
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AuctionFormScreen(
     navController: NavHostController,
@@ -29,88 +31,114 @@ fun AuctionFormScreen(
     var title by remember { mutableStateOf("") }
     var description by remember { mutableStateOf("") }
     var currentBid by remember { mutableStateOf("") }
-    var imageUrl by remember { mutableStateOf("") } // <-- ¡Añadida la variable para imageUrl!
+    var imageUrl by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp)
-    ) {
-        Text("Crear nueva subasta", style = MaterialTheme.typography.headlineMedium)
-
-        OutlinedTextField(
-            value = title,
-            onValueChange = { title = it },
-            label = { Text("Título") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = description,
-            onValueChange = { description = it },
-            label = { Text("Descripción") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        OutlinedTextField(
-            value = currentBid,
-            onValueChange = { currentBid = it },
-            label = { Text("Puja inicial") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        OutlinedTextField( // <-- ¡Nuevo campo para la URL de la imagen!
-            value = imageUrl,
-            onValueChange = { imageUrl = it },
-            label = { Text("URL de la Imagen") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        )
-
-        // Botón "Guardar subasta"
-        Button(
-            onClick = {
-                if (title.isNotBlank() && description.isNotBlank() && currentBid.toDoubleOrNull() != null) {
-                    val newAuction = AuctionEntity(
-                        id = UUID.randomUUID().toString(),
-                        title = title,
-                        description = description,
-                        currentBid = currentBid.toDouble(),
-                        isFinished = false, // Puedes mantenerlo como false por defecto al crear
-                        imageUrl = imageUrl // <-- ¡Añadido el campo imageUrl!
-                    )
-                    viewModel.addAuctionLocallyAndRemotely(newAuction)
-                    // Limpiar los campos después de guardar
-                    title = ""
-                    description = ""
-                    currentBid = ""
-                    imageUrl = "" // <-- Limpiar también el campo de la URL de la imagen
-                    // Opcional: Volver al home después de guardar exitosamente
-                    navController.popBackStack()
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Nueva Subasta") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
                 }
-            },
-            modifier = Modifier.padding(top = 16.dp)
-        ) {
-            Text("Guardar subasta")
+            )
         }
-
-        // Espacio entre los botones
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // --- Nuevo botón para volver al Home ---
-        Button(
-            onClick = { navController.popBackStack() }, // Esto vuelve a la pantalla anterior
-            modifier = Modifier.fillMaxWidth() // Puedes ajustar el Modifier según tu diseño
+    ) { paddingValues ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(16.dp)
         ) {
-            Text("Volver al Home")
+            Text(
+                "Ingresa los detalles de la subasta",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Título de la Subasta") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = description,
+                onValueChange = { description = it },
+                label = { Text("Descripción Detallada") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp) // Permite múltiples líneas
+                    .padding(vertical = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = currentBid,
+                onValueChange = { newValue ->
+                    // Solo permite números y un punto decimal
+                    // La validación de entrada sigue aquí para asegurar que solo se ingresen números
+                    if (newValue.matches(Regex("^\\d*\\.?\\d*\$"))) {
+                        currentBid = newValue
+                    }
+                },
+                label = { Text("Puja Inicial (ej. 100.00)") },
+                // Eliminadas las líneas de keyboardOptions
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+
+            OutlinedTextField(
+                value = imageUrl,
+                onValueChange = { imageUrl = it },
+                label = { Text("URL de la Imagen (Opcional)") },
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {
+                    val bidValue = currentBid.toDoubleOrNull()
+                    if (title.isNotBlank() && description.isNotBlank() && bidValue != null) {
+                        val newAuction = AuctionEntity(
+                            id = UUID.randomUUID().toString(),
+                            title = title,
+                            description = description,
+                            currentBid = bidValue,
+                            isFinished = false,
+                            imageUrl = imageUrl
+                        )
+                        viewModel.addAuctionLocallyAndRemotely(newAuction)
+                        navController.popBackStack()
+                    } else {
+                        // Opcional: mostrar un Toast o Snackbar si los campos no son válidos
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = title.isNotBlank() && description.isNotBlank() && currentBid.toDoubleOrNull() != null
+            ) {
+                Text("Guardar Subasta")
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Cancelar y Volver")
+            }
         }
-        // ----------------------------------------
     }
 }

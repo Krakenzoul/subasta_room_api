@@ -8,6 +8,6 @@ data class Auction(
     val title: String,
     val description: String,
     val currentBid: Double,
-    val imageUrl: String // <--- ¡CAMBIO CRÍTICO! Debe ser 'imageUrl' para coincidir con tu servidor Ktor
-    // val isFinished: Boolean // <--- ELIMINAR si el servidor no lo envía como parte del objeto principal
+    val imageUrl: String, // <--- ¡CAMBIO CRÍTICO! Debe ser 'imageUrl' para coincidir con tu servidor Ktor
+    val isActive: Boolean = true
 )
