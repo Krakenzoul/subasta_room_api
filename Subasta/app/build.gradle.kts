@@ -61,12 +61,16 @@ dependencies {
     implementation(libs.androidx.storage)
     kapt("androidx.room:room-compiler:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0") // ¡Verifica que esta esté!
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Core y ciclo de vida
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
-
+    implementation("io.coil-kt:coil-compose:2.6.0")
     // Compose BOM (estándar)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

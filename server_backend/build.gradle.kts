@@ -24,6 +24,11 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm:2.3.2")
     implementation("io.ktor:ktor-server-call-logging-jvm:2.3.2")
     implementation("ch.qos.logback:logback-classic:1.5.13")
+    // Ktor Content Negotiation Feature
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.3.2") // Usamos -jvm explícitamente
+
+    // Ktor Serialization with Gson
+    implementation("io.ktor:ktor-serialization-gson-jvm:2.3.2") // Usamos -jvm explícitamente
 
 }
 
